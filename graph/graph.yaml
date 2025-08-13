@@ -1,0 +1,91 @@
+defaults:
+  - override hydra/job_logging: none
+  - override hydra/hydra_logging: none
+  - _self_
+
+config_validation: False
+
+nodes:
+  data:
+    node_builder:
+      _target_: anemoi.graphs.nodes.AnemoiDatasetNodes
+      dataset: 
+        cutout:
+          - dataset: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2/1980/zarr/nordic4_surge_ocean_1980.zarr #regional
+            trim_edge: 2
+            #thinning: 4
+          - dataset: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2/1980/zarr/nordic4_surge_ocean_1980.zarr #global
+            #thinning: 4
+        adjust: all
+        min_distance_km: 4 #test both thinning and min_distance 
+    attributes:
+      cutout_mask:
+        _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      boundary_mask:
+        _target_: anemoi.graphs.nodes.attributes.BooleanNot
+        masks:
+          _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      area_weight:
+        _target_: anemoi.graphs.nodes.attributes.UniformWeights # options: Uniform
+        #mask_node_attr_name: cutout_mask ---> this should work with anemoi.graphs.nodes.attributes.MaskedPlanarAreaWeights, but not here
+        norm: unit-max
+  hidden:
+    node_builder:
+      _target_: anemoi.graphs.nodes.LimitedAreaTriNodes
+      resolution: 5 # change this to something much higher
+      reference_node_name: data
+      mask_attr_name: cutout_mask
+  
+edges:
+# Encoder configuration
+- source_name: data
+  target_name: hidden
+  edge_builders:
+  - _target_: anemoi.graphs.edges.CutOffEdges # options: KNNEdges, CutOffEdges
+    cutoff_factor: 0.6 # only for cutoff method
+    source_mask_attr_name: null
+    target_mask_attr_name: null
+  - _target_: anemoi.graphs.edges.CutOffEdges # connects only boundary nodes
+    cutoff_factor: 0.6 # only for cutoff method
+    source_mask_attr_name: boundary_mask
+    target_mask_attr_name: null
+  attributes: 
+    edge_length:
+      _target_: anemoi.graphs.edges.attributes.EdgeLength
+      norm: unit-std
+    edge_dirs:
+      _target_: anemoi.graphs.edges.attributes.EdgeDirection
+      norm: unit-std
+# Processor configuration
+- source_name: hidden
+  target_name: hidden
+  edge_builders:
+  - _target_: anemoi.graphs.edges.MultiScaleEdges
+    x_hops: 1
+    scale_resolutions: 8 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
+    source_mask_attr_name: null
+    target_mask_attr_name: null
+  attributes: 
+    edge_length:
+      _target_: anemoi.graphs.edges.attributes.EdgeLength
+      norm: unit-std
+    edge_dirs:
+      _target_: anemoi.graphs.edges.attributes.EdgeDirection
+      norm: unit-std
+# Decoder configuration
+- source_name: hidden
+  target_name: data
+  edge_builders:
+  - _target_: anemoi.graphs.edges.KNNEdges # options: KNNEdges, CutOffEdges
+    num_nearest_neighbours: 3 # only for knn method
+    source_mask_attr_name: null
+    target_mask_attr_name: cutout_mask
+  attributes: 
+    edge_length:
+      _target_: anemoi.graphs.edges.attributes.EdgeLength
+      norm: unit-std
+    edge_dirs:
+      _target_: anemoi.graphs.edges.attributes.EdgeDirection
+      norm: unit-std
+
+
