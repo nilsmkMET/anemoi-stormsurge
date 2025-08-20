@@ -12,9 +12,11 @@ nodes:
       dataset: 
         cutout:
           - dataset: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2/1980/zarr/nordic4_surge_ocean_1980.zarr #regional
-            trim_edge: 2
+          # - dataset: /lustre/storeB/users/nilsmk/Forcing/nordic4km_stress/n3e5_remake/zarr/nordic4_surge_atmos_1980_Pair.zarr #regional
+            trim_edge: 5
             #thinning: 4
           - dataset: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2/1980/zarr/nordic4_surge_ocean_1980.zarr #global
+          # - dataset: /lustre/storeB/users/nilsmk/Forcing/nordic4km_stress/n3e5_remake/zarr/nordic4_surge_atmos_1980_Pair.zarr #global
             #thinning: 4
         adjust: all
         min_distance_km: 4 #test both thinning and min_distance 
@@ -32,7 +34,7 @@ nodes:
   hidden:
     node_builder:
       _target_: anemoi.graphs.nodes.LimitedAreaTriNodes
-      resolution: 5 # change this to something much higher
+      resolution: 10 # change this to something much higher
       reference_node_name: data
       mask_attr_name: cutout_mask
   
@@ -41,12 +43,16 @@ edges:
 - source_name: data
   target_name: hidden
   edge_builders:
+  # - _target_: anemoi.graphs.edges.KNNEdges # options: KNNEdges, CutOffEdges
+    # num_nearest_neighbours: 3 # only for knn method
   - _target_: anemoi.graphs.edges.CutOffEdges # options: KNNEdges, CutOffEdges
-    cutoff_factor: 0.6 # only for cutoff method
+    cutoff_factor: 1.0 # only for cutoff method
     source_mask_attr_name: null
     target_mask_attr_name: null
-  - _target_: anemoi.graphs.edges.CutOffEdges # connects only boundary nodes
-    cutoff_factor: 0.6 # only for cutoff method
+  # - _target_: anemoi.graphs.edges.KNNEdges # connects only boundary nodes
+    # num_nearest_neighbours: 3 # only for knn method
+  - _target_: anemoi.graphs.edges.CutOffEdges # options: KNNEdges, CutOffEdges
+    cutoff_factor: 1.0 # only for cutoff method
     source_mask_attr_name: boundary_mask
     target_mask_attr_name: null
   attributes: 
@@ -62,7 +68,8 @@ edges:
   edge_builders:
   - _target_: anemoi.graphs.edges.MultiScaleEdges
     x_hops: 1
-    scale_resolutions: 8 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
+    # scale_resolutions: 8 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
+    scale_resolutions: 4 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
     source_mask_attr_name: null
     target_mask_attr_name: null
   attributes: 

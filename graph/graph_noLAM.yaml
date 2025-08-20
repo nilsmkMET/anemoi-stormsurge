@@ -1,0 +1,44 @@
+defaults:
+  - override hydra/job_logging: none
+  - override hydra/hydra_logging: none
+  - _self_
+
+config_validation: False
+
+nodes:
+  data:
+    node_builder:
+      _target_: anemoi.graphs.nodes.AnemoiDatasetNodes
+      dataset: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2/1980/zarr/nordic4_surge_ocean_1980.zarr
+    attributes:
+      area_weight:
+        _target_: anemoi.graphs.nodes.attributes.UniformWeights # options: Uniform
+        norm: unit-max
+  hidden:
+    node_builder:
+      _target_: anemoi.graphs.nodes.TriNodes
+      resolution: 5 # change this to something much higher
+      # reference_node_name: data
+      # mask_attr_name: cutout_mask
+  
+edges:
+# Encoder configuration
+- source_name: data
+  target_name: hidden
+  edge_builders:
+  - _target_: anemoi.graphs.edges.CutOffEdges # options: KNNEdges, CutOffEdges
+    cutoff_factor: 0.7 # only for cutoff method
+# Processor configuration
+- source_name: hidden
+  target_name: hidden
+  edge_builders:
+  - _target_: anemoi.graphs.edges.MultiScaleEdges
+    x_hops: 1
+    scale_resolutions: 4    
+# Decoder configuration
+- source_name: hidden
+  target_name: data
+  edge_builders:
+  - _target_: anemoi.graphs.edges.KNNEdges # options: KNNEdges, CutOffEdges
+    num_nearest_neighbours: 3 # only for knn method
+

@@ -132,11 +132,83 @@ def fix_timevar(nc_file):
         timevar[:] = tmpvar
         ds.sync()
 
+def add_uwind_vwind(atm_file):
+    """
+    Changes the UV grid to RHO grid in a netCDF file.
+    Args:
+        atm_file (str): Path to the netCDF file.
+    """
+    import netCDF4
+    # Open netcdf file in r+ mode, add variable Uwind and Vwind, with same dimensions as Pair
+    # copy attributes from Pair to Uwind and Vwind
+    # standard names for Uwind and Vwind are 'x_wind' and 'y_wind'
+    with netCDF4.Dataset(atm_file, 'r+') as ds:
+        if 'Pair' in ds.variables:
+            Pair = ds.variables['Pair']
+            # Check if Uwind and Vwind already exist
+            if 'Uwind' in ds.variables and 'Vwind' in ds.variables:
+                print("Uwind and Vwind variables already exist in the file.")
+            else:
+                print("Adding Uwind and Vwind variables to the file.")
+                # Create Uwind and Vwind variables with same dimensions as Pair
+                Uwind = ds.createVariable('Uwind', Pair.dtype, Pair.dimensions)
+                Vwind = ds.createVariable('Vwind', Pair.dtype, Pair.dimensions)
+                # Copy attributes from Pair to Uwind and Vwind
+                Uwind.setncatts(Pair.__dict__)
+                Vwind.setncatts(Pair.__dict__)
+                # Set standard names for Uwind and Vwind
+                Uwind.standard_name = 'x_wind'
+                Vwind.standard_name = 'y_wind'
+                # Set long names for Uwind and Vwind
+                Uwind.long_name = 'U wind component'
+                Vwind.long_name = 'V wind component'
+                # Set units for Uwind and Vwind
+                Uwind.units = 'm/s'
+                Vwind.units = 'm/s'
 
+def revert_stress_to_wind(atm_file):
+    """
+    Reverts the stress variables in a netCDF file to wind components.
+    Args:
+        atm_file (str): Path to the netCDF file.
+    """
+    import netCDF4  
+    from stress_calc import stress2ocn
+    # Open the netCDF file
+    with netCDF4.Dataset(atm_file, 'r+') as ds:
+        # Check if the required variables exist (sustr = taux, svstr = tauy)
+        if 'sustr' in ds.variables and 'svstr' in ds.variables:
+            # Loop over time to save memory
+            for t in range(ds.dimensions['time'].size):
+                print(t)
+                # Extract the stress variables for the current time step
+                taux_slice = ds.variables['sustr'][t, :-1, :]
+                tauy_slice = ds.variables['svstr'][t, :, :-1]
+                # Call the stress2ocn function to convert stress to wind components
+                u_out, v_out = stress2ocn(taux_slice, tauy_slice)
+                # Write into existing Uwind and Vwind variables
+                if 'Uwind' in ds.variables and 'Vwind' in ds.variables:
+                    ds.variables['Uwind'][t,:-1,:-1] = u_out[:]
+                    ds.variables['Vwind'][t,:-1,:-1] = v_out[:]
+                    # Fill the rest of the grid with the nearest neighbor
+                    ds.variables['Uwind'][t,-1,:-1] = u_out[-1,:]
+                    ds.variables['Vwind'][t,-1,:-1] = v_out[-1,:]
+                    ds.variables['Uwind'][t,:-1,-1] = u_out[:,-1]
+                    ds.variables['Vwind'][t,:-1,-1] = v_out[:,-1]
+                    # Fill the corners with the nearest neighbor
+                    ds.variables['Uwind'][t,-1,-1] = u_out[-1,-1]
+                    ds.variables['Vwind'][t,-1,-1] = v_out[-1,-1]
+                    print("Stress variables reverted to wind components successfully.")
+                else:
+                    print("Uwind and Vwind variables do not exist in the file.")
+                ds.sync()
+        else:
+            print("Required stress variables (sustr, svstr) not found in the file.")
+        print("Stress variables reverted to wind components successfully.")
 ####################################################################
 # Ensure the script is run with the correct number of arguments
 if len(sys.argv) != 4:
-    print("Usage: python fix_nc_files.py <atm_file> <grd_file> <latlonuv_file>")
+    print("Usage: python fix_atmos_nc_files.py <atm_file> <grd_file> <latlonuv_file>")
     sys.exit(1)
 
 atm_file      = sys.argv[1]
@@ -147,7 +219,7 @@ print(f"Processing atmospheric file: {atm_file}")
 print(f"Using grid file: {grd_file}")
 print(f"Using latlonuv file: {latlonuv_file}")
 
-if True:
+if False:
     # Check if lat_rho and lon_rho on atmospheric file
     import netCDF4
     with netCDF4.Dataset(atm_file, 'r') as ds:
@@ -175,5 +247,15 @@ if False:
     # add_latlon_standard_name_xarray(atm_file)
     add_latlon_standard_name_nco(atm_file, latlonuv_file)
     print(f"Added standard names for latitude and longitude variables in {atm_file}.")
+
+if True:
+    # Add Uwind and Vwind variables to the atmospheric file
+    add_uwind_vwind(atm_file)
+    print(f"Added Uwind and Vwind variables to {atm_file}.")
+
+if True:
+    # Revert stress variables to wind components
+    revert_stress_to_wind(atm_file)
+    print(f"Reverted stress variables to wind components in {atm_file}.")
 
 print(f"Processed {atm_file} with grid file {grd_file} and {latlonuv_file}.")
