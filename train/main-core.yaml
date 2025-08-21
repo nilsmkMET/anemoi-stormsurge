@@ -19,29 +19,23 @@ hydra:
     dir: .
 
 data:
-  frequency: 3h
-  timestep: 3h
+  frequency: 1h
+  timestep: 1h
   forcing:
   - h
-  - Pair             
-  - Qair             
-  - Tair   
   - Uwind
   - Vwind              
-  - cloud # available from 2017       
   - cos_julian_day   
   - cos_latitude     
   - cos_local_time   
   - cos_longitude    
   - f                
   - insolation       
-  - rain             
-  - river_binary_mask
   - sin_julian_day   
   - sin_latitude   
   - sin_local_time
   - sin_longitude
-  - sea_mask
+  - mask_rho
 
   diagnostic: []
     
@@ -133,8 +127,8 @@ dataloader:
 
   training:
     dataset: ${dataloader.dataset} 
-    start: 2023-01-01
-    end: 2023-12-31
+    start: 1980-01-01
+    end: 1980-12-31
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
   validation_rollout: 1 # TODO change later
@@ -167,15 +161,14 @@ diagnostics:
 
 hardware:
   paths:
-    data: /pfs/lustrep3/scratch/project_465001902/datasets/
-    output: /pfs/lustrep3/scratch/project_465001902/experiments/replace-zarr/
-    graph: /pfs/lustrep3/scratch/project_465001902/graphs/
+    data: /lustre/storeB/users/nilsmk/anemoi-datasets/input/
+    output: /lustre/storeB/users/nilsmk/anemoi-datasets/output/first_try/
+    graph: /home/nilsmk/GIT/anemoi-stormsurge/output/
   files:
     dataset:
-      dataset_main: norkystv3_hindcast_2012-2024.zarr
-      dataset_force: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2017-2024.zarr
-      #dataset_force12-16: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2012-2016.zarr  # Enable this for longer training. Then exclude cloud-
-    graph: trim_edge_10_res_10.pt
+      dataset_main: nordic4_surge_ocean_1980.zarr
+      dataset_force: ['nordic4_surge_atmos_1980_Pair.zarr', 'nordic4_surge_atmos_1980_wind.zarr']
+    graph: graph10.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
   #num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
