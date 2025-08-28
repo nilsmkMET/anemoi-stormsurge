@@ -1,0 +1,27 @@
+dates:
+  start: '1980-01-01T00:00:00'
+  end: '1980-12-31T23:00:00'
+  frequency: 1h
+  missing: []
+build:
+  group_by: 24
+input:
+  join:
+  - netcdf:
+      path: /lustre/storeB/users/nilsmk/Forcing/nordic4km_stress/n3e5_remake/stress_nora3era5_N4_1980.nc.fixedlatlonuv
+      param:
+      - Uwind
+      - Vwind
+      - Pair
+  - constants:
+      param:
+      - cos_latitude
+      - cos_longitude
+      - sin_latitude
+      - sin_longitude
+      - cos_julian_day
+      - cos_local_time
+      - sin_julian_day
+      - sin_local_time
+      - insolation
+      template: ${input.join.0.netcdf}

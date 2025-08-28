@@ -22,3 +22,4 @@ input:
           param:
           - h
           - mask_rho
+          - f

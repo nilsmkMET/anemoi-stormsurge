@@ -24,7 +24,8 @@ data:
   forcing:
   - h
   - Uwind
-  - Vwind              
+  - Vwind
+  - Pair             
   - cos_julian_day   
   - cos_latitude     
   - cos_local_time   
@@ -46,17 +47,8 @@ data:
       config: 
         default: "none"
         mean:  
-        - salinity_0
-        - temperature_0
-        - u_eastward_0
-        - v_northward_0
         - zeta
-        # Mean:
-        # salinity_0 34.2275
-        # temperature_0 8.85046375
-        # u_eastward_0 0.0181013125
-        # v_northward_0 0.013216155
-        # zeta -0.22607975000000002
+
   
     normalizer:
       _target_: anemoi.models.preprocessing.normalizer.InputNormalizer
@@ -77,9 +69,7 @@ data:
         - sin_latitude   
         - sin_local_time
         - sin_longitude
-        - cloud # available from 2017
-        - river_binary_mask
-        - sea_mask
+        - mask_rho
       
 dataloader:
   num_workers:
@@ -102,14 +92,14 @@ dataloader:
         join:
           - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
             frequency: ${data.frequency}
-            start: 2017
-            end: 2024
+            start: 1980
+            end: 1980
           - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
             frequency: ${data.frequency}
           #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16} # Enable this for longer training. Then exclude cloud-
           #  frequency: ${data.frequency}
         adjust: ["start", "end"]
-      trim_edge: 10
+      trim_edge: 5
     - dataset:
         join:
           - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
@@ -128,21 +118,21 @@ dataloader:
   training:
     dataset: ${dataloader.dataset} 
     start: 1980-01-01
-    end: 1980-12-31
-    drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
+    end: 1980-02-01
+    drop: []
 
   validation_rollout: 1 # TODO change later
 
   validation:
     dataset: ${dataloader.dataset}
-    start: 2024-01-01
-    end: 2024-02-29
-    drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
+    start: 1908-02-01
+    end: 1980-03-01
+    drop: []
   test:
     dataset: ${dataloader.dataset}
-    start: 2024-03-01
-    end: 2024-12-31
-    drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
+    start: 1980-02-01
+    end: 1980-03-01
+    drop: []
 
 diagnostics:
   plot: 
@@ -153,8 +143,8 @@ diagnostics:
       offline: True
       authentication: True
       tracking_uri: https://mlflow.ecmwf.int
-      experiment_name: 'metno-fou'
-      run_name: 'replace-zarr' #change this
+      experiment_name: 'metno-fou-stormflo'
+      run_name: 'first_test' #change this
     wandb: 
       entity: null
   print_memory_summary: True
@@ -171,9 +161,9 @@ hardware:
     graph: graph10.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
-  #num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
-  #num_nodes: 1
-  num_gpus_per_model: 8 # TODO: 8 better? This is so-called "model-paralell"
+  num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
+  num_nodes: 1
+  num_gpus_per_model: 1 # TODO: 8 better? This is so-called "model-paralell"
 
 graph:
   overwrite: False # only create/re-generate the graph with True
@@ -195,13 +185,6 @@ model:
     data2hidden: 0
     hidden2data: 0
     hidden2hidden: 0 # GNN and GraphTransformer Processor only
-  bounding: #These are applied in order
-    - _target_: anemoi.models.layers.bounding.ReluBounding #[0, infinity)
-      variables: [salinity_0]
-    - _target_: anemoi.models.layers.bounding.NormalizedReluBounding
-      variables: [temperature_0]
-      min_val: [-2]
-      normalizer: ['mean-std']
   output_mask: # suggested by lam.yaml
     _target_: anemoi.training.utils.masks.Boolean1DMask
     nodes_name: ${graph.data}
