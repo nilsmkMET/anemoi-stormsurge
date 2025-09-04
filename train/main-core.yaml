@@ -157,8 +157,8 @@ hardware:
   files:
     dataset:
       dataset_main: nordic4_surge_ocean_1980.zarr
-      dataset_force: ['nordic4_surge_atmos_1980_Pair.zarr', 'nordic4_surge_atmos_1980_wind.zarr']
-    graph: graph10.pt
+      dataset_force: nordic4_surge_atmos_1980.zarr # must have ocean file here also since h and f is on that file?
+    graph: graph10.2.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
   num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh

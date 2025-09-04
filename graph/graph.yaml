@@ -95,4 +95,9 @@ edges:
       _target_: anemoi.graphs.edges.attributes.EdgeDirection
       norm: unit-std
 
+post_processors:
+  - _target_: anemoi.graphs.processors.RemoveUnconnectedNodes
+    nodes_name: data
+    ignore: cutout_mask # optional
+    save_mask_indices_to_attr: indices_connected_nodes # optional
 

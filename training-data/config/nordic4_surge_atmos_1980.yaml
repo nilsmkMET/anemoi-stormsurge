@@ -25,3 +25,4 @@ input:
       - sin_local_time
       - insolation
       template: ${input.join.0.netcdf}
+      #template: ${input.join.netcdf}      #??
