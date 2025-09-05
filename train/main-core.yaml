@@ -130,8 +130,8 @@ dataloader:
     drop: []
   test:
     dataset: ${dataloader.dataset}
-    start: 1980-02-01
-    end: 1980-03-01
+    start: 1980-03-01
+    end: 1980-04-01
     drop: []
 
 diagnostics:
@@ -185,6 +185,9 @@ model:
     data2hidden: 0
     hidden2data: 0
     hidden2hidden: 0 # GNN and GraphTransformer Processor only
+  bounding: #These are applied in order
+    - _target_: anemoi.models.layers.bounding.ReluBounding
+      variables: [] #[salinity_0]
   output_mask: # suggested by lam.yaml
     _target_: anemoi.training.utils.masks.Boolean1DMask
     nodes_name: ${graph.data}
@@ -209,7 +212,7 @@ training:
   load_weights_only: False #loads entire model if False, loads only weights if True
   
   max_epochs: null
-  max_steps: 50000
+  max_steps: 20000
   lr:
     warmup: 1000 # number of warmup iterations
     rate: 6.25e-5 #local_lr

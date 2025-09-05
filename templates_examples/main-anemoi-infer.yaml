@@ -1,0 +1,32 @@
+# Docs:
+# https://anemoi.readthedocs.io/projects/inference/en/latest/inference/configs/top-level.html
+
+checkpoint: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2024-cloud/checkpoint/c544a0337a0644b8a0c33a92f6d007d5/inference-last.ckpt
+
+date: 2024-03-02 #specifies the reference date of the forecast (the starting date)
+
+lead_time: 48h # specifies the forecast lead time in hours
+
+#device: cuda
+runner: parallel # run across multiple gpus
+
+input: test # use the dataset that was used during training as input. test (default), training or validation
+
+# You can also provide a full dataset specification as follows:
+# (e.g. as done in training)
+#input:
+#  dataset:
+#    cutout:
+#      - dataset: ...
+
+#output:
+#  netcdf: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2024-cloud/inference/full-reset.nc
+
+# Or get only output on the lam area
+output:
+  extract_lam:
+    output:
+      netcdf:
+        path: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2024-cloud/inference/lam-48h.nc
+
+# its also possible to output truth
