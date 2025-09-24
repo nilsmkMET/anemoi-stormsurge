@@ -1,0 +1,28 @@
+dates:
+  start: 'YYYY-01-01T00:00:00'
+  end: 'YYYY-12-31T23:00:00'
+  frequency: 1h
+  missing: []
+build:
+  group_by: 24
+input:
+  join:
+  - netcdf:
+      path: /lustre/storeB/users/nilsmk/Forcing/nordic4km_stress/nora3era5_remake2/nora3era5_N4_YYYY.nc
+      param:
+      - x_wind_10m
+      - y_wind_10m
+      - air_pressure_at_sea_level
+  - constants:
+      param:
+      - cos_latitude
+      - cos_longitude
+      - sin_latitude
+      - sin_longitude
+      - cos_julian_day
+      - cos_local_time
+      - sin_julian_day
+      - sin_local_time
+      - insolation
+      template: ${input.join.0.netcdf}
+      #template: ${input.join.netcdf}      #??
