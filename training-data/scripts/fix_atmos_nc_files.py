@@ -146,25 +146,31 @@ def add_uwind_vwind(atm_file):
         if 'Pair' in ds.variables:
             Pair = ds.variables['Pair']
             # Check if Uwind and Vwind already exist
-            if 'Uwind' in ds.variables and 'Vwind' in ds.variables:
-                print("Uwind and Vwind variables already exist in the file.")
+            if 'Uwind' in ds.variables:
+                print("Uwind variable already exist in the file.")
             else:
-                print("Adding Uwind and Vwind variables to the file.")
-                # Create Uwind and Vwind variables with same dimensions as Pair
+                print("Adding Uwind variable to the file.")
+                # Create Uwind variable with same dimensions as Pair
                 Uwind = ds.createVariable('Uwind', Pair.dtype, Pair.dimensions)
+            if 'Vwind' in ds.variables:
+                print("Vwind variable already exist in the file.")
+            else:
+                print("Adding Vwind variable to the file.")
+                # Create Vwind variable with same dimensions as Pair
                 Vwind = ds.createVariable('Vwind', Pair.dtype, Pair.dimensions)
-                # Copy attributes from Pair to Uwind and Vwind
-                Uwind.setncatts(Pair.__dict__)
-                Vwind.setncatts(Pair.__dict__)
-                # Set standard names for Uwind and Vwind
-                Uwind.standard_name = 'x_wind'
-                Vwind.standard_name = 'y_wind'
-                # Set long names for Uwind and Vwind
-                Uwind.long_name = 'U wind component'
-                Vwind.long_name = 'V wind component'
-                # Set units for Uwind and Vwind
-                Uwind.units = 'm/s'
-                Vwind.units = 'm/s'
+            # Copy attributes from Pair to Uwind and Vwind
+            Uwind.setncatts(Pair.__dict__)
+            Vwind.setncatts(Pair.__dict__)
+            # Set standard names for Uwind and Vwind
+            Uwind.standard_name = 'x_wind'
+            Vwind.standard_name = 'y_wind'
+            # Set long names for Uwind and Vwind
+            Uwind.long_name = 'U wind component'
+            Vwind.long_name = 'V wind component'
+            # Set units for Uwind and Vwind
+            Uwind.units = 'm/s'
+            Vwind.units = 'm/s'
+            ds.sync()
 
 def revert_stress_to_wind(atm_file):
     """

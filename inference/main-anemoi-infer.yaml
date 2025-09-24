@@ -5,7 +5,7 @@ checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/first_try/checkpo
 
 date: 1980-03-02 #specifies the reference date of the forecast (the starting date)
 
-lead_time: 48h # specifies the forecast lead time in hours
+lead_time: 240h # specifies the forecast lead time in hours
 
 #device: cuda
 # runner: parallel # run across multiple gpus
@@ -28,6 +28,6 @@ output:
   extract_lam:
     output:
       netcdf:
-        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/first_try/inference/lam-48h.nc
+        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/first_try/inference/lam-240h.nc
 
 # its also possible to output truth

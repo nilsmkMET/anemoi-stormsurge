@@ -23,9 +23,9 @@ data:
   timestep: 1h
   forcing:
   - h
-  - Uwind
-  - Vwind
-  - Pair             
+  - x_wind_10m
+  - y_wind_10m
+  - air_pressure_at_sea_level
   - cos_julian_day   
   - cos_latitude     
   - cos_local_time   
@@ -93,7 +93,7 @@ dataloader:
           - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
             frequency: ${data.frequency}
             start: 1980
-            end: 1980
+            end: 2022
           - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
             frequency: ${data.frequency}
           #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16} # Enable this for longer training. Then exclude cloud-
@@ -115,23 +115,23 @@ dataloader:
     nodes_name: data
     node_attribute_name: indices_connected_nodes
 
-  training:
+  training: #ca 70%
     dataset: ${dataloader.dataset} 
     start: 1980-01-01
-    end: 1980-02-01
+    end: 2004-01-01
     drop: []
 
   validation_rollout: 1 # TODO change later
 
-  validation:
+  validation: # ca 30%
     dataset: ${dataloader.dataset}
-    start: 1908-02-01
-    end: 1980-03-01
+    start: 2004-01-01
+    end: 2013-01-01
     drop: []
-  test:
+  test: # ca 3-5 years
     dataset: ${dataloader.dataset}
-    start: 1980-03-01
-    end: 1980-04-01
+    start: 2013-01-01
+    end: 2022-12-31
     drop: []
 
 diagnostics:
@@ -152,12 +152,12 @@ diagnostics:
 hardware:
   paths:
     data: /lustre/storeB/users/nilsmk/anemoi-datasets/input/
-    output: /lustre/storeB/users/nilsmk/anemoi-datasets/output/first_try/
+    output: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun/
     graph: /home/nilsmk/GIT/anemoi-stormsurge/output/
   files:
     dataset:
-      dataset_main: nordic4_surge_ocean_1980.zarr
-      dataset_force: nordic4_surge_atmos_1980.zarr # must have ocean file here also since h and f is on that file?
+      dataset_main: nordic4_surge_ocean_1980-2022.zarr
+      dataset_force: nordic4_surge_atmos_1980-2022.zarr
     graph: graph10.2.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
