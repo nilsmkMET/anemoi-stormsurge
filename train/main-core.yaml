@@ -152,7 +152,7 @@ diagnostics:
 hardware:
   paths:
     data: /lustre/storeB/users/nilsmk/anemoi-datasets/input/
-    output: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun/
+    output: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun2/
     graph: /home/nilsmk/GIT/anemoi-stormsurge/output/
   files:
     dataset:
@@ -212,7 +212,7 @@ training:
   load_weights_only: False #loads entire model if False, loads only weights if True
   
   max_epochs: null
-  max_steps: 20000
+  max_steps: 100000
   lr:
     warmup: 1000 # number of warmup iterations
     rate: 6.25e-5 #local_lr
