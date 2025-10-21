@@ -1,0 +1,25 @@
+dates:
+  start: 'YYYY-01-01T00:00:00'
+  end: 'YYYY-12-31T23:00:00'
+  frequency: 1h
+  missing: []
+build:
+  group_by: 24
+statistics:
+  allow_nans:
+  - zeta
+input:
+  join:
+  - netcdf:
+      path: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2_corrected/YYYY/ocean_his.nc
+      param:
+      - zeta
+  - repeated_dates:
+      mode: constant
+      source:
+        netcdf:
+          path: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2_corrected/YYYY/ocean_his.nc
+          param:
+          - h
+          - mask_rho
+          - f

@@ -96,8 +96,6 @@ dataloader:
             end: 2022
           - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
             frequency: ${data.frequency}
-          #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16} # Enable this for longer training. Then exclude cloud-
-          #  frequency: ${data.frequency}
         adjust: ["start", "end"]
       trim_edge: 5
     - dataset:
@@ -106,8 +104,6 @@ dataloader:
             frequency: ${data.frequency}
           - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
             frequency: ${data.frequency}
-          #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16}
-          #  frequency: ${data.frequency}
         adjust: ["start", "end"]
     adjust: all
   grid_indices:
@@ -118,19 +114,19 @@ dataloader:
   training: #ca 70%
     dataset: ${dataloader.dataset} 
     start: 1980-01-01
-    end: 2004-01-01
+    end: 1990-01-01
     drop: []
 
   validation_rollout: 1 # TODO change later
 
   validation: # ca 30%
     dataset: ${dataloader.dataset}
-    start: 2004-01-01
-    end: 2013-01-01
+    start: 1990-01-01
+    end: 2000-01-01
     drop: []
   test: # ca 3-5 years
     dataset: ${dataloader.dataset}
-    start: 2013-01-01
+    start: 2000-01-01
     end: 2022-12-31
     drop: []
 
@@ -151,7 +147,7 @@ diagnostics:
   checkpoint:
     every_n_minutes:
       save_frequency: 30 # Approximate, as this is checked at the end of training steps
-      num_models_saved: 3 # If set to k, saves the 'last' k model weights in the training.
+      num_models_saved: -1 # If set to k, saves the 'last' k model weights in the training.
 
     every_n_epochs:
       save_frequency: 1
@@ -159,13 +155,13 @@ diagnostics:
 
     every_n_train_steps:
       save_frequency: 1000 # Does not scale with rollout
-      num_models_saved: 15
+      num_models_saved: -1
 
 
 hardware:
   paths:
     data: /lustre/storeB/users/nilsmk/anemoi-datasets/input/
-    output: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun3/
+    output: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years/
     graph: /home/nilsmk/GIT/anemoi-stormsurge/output/
   files:
     dataset:
@@ -223,15 +219,15 @@ training:
 
   #TODO rollout is here
 
-  run_id: ada01cf711a3442dbe86f083e8156ab2 # checkpoint id for the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
-  fork_run_id: ada01cf711a3442dbe86f083e8156ab2 #path to the experiment to fork from with output_base as root
+  run_id: a8bd313710bf4ad58c17f1c2ada8aabc # checkpoint id for the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
   # run_id: null # checkpoint id for the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
-  # fork_run_id: null #path to the experiment to fork from with output_base as root
+  # fork_run_id: 906fcc7ffc6248499206a0cc720deda8 #path to the experiment to fork from with output_base as root
+  fork_run_id: null #path to the experiment to fork from with output_base as root
   transfer_learning: True # activate to perform transfer learning
   load_weights_only: True # loads entire model if False, loads only weights if True
   
   max_epochs: 50
-  max_steps: 5e6
+  max_steps: 1e5
   lr:
     warmup: 1000 # number of warmup iterations
     rate: 6.25e-4 #local_lr, was orig 6.25e-5

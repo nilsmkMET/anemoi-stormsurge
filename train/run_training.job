@@ -1,0 +1,21 @@
+#!/bin/bash
+#SBATCH --job-name="anemoi_surge"
+#SBATCH --output=/home/nilsmk/logs/training_gpuHPLmpi-%x.%J.%N.out.log
+#SBATCH --gres=gpu:nvidia_h200_nvl:1
+#SBATCH --partition=gpuB-research
+#SBATCH --time=96:00:00
+#SBATCH --account=stormsurge_ml
+#SBATCH --mem=64g
+#SBATCH --mail-type=FAIL,END
+#SBATCH --mail-user=nilsmk@met.no
+#SBATCH --ntasks-per-node=1
+
+source ~/venv/anemoi/bin/activate
+ulimit -v unlimited
+export HYDRA_FULL_ERROR=1
+export SLURM_GPUS_PER_NODE=1
+export SLURM_NNODES=1
+export SLURM_NTASKS_PER_NODE=1
+cd /home/nilsmk/GIT/anemoi-stormsurge/train
+# anemoi-training train --config-name=main-core
+anemoi-training train --config-name=main-core-train10years

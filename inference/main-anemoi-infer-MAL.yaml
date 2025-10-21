@@ -2,9 +2,9 @@
 # https://anemoi.readthedocs.io/projects/inference/en/latest/inference/configs/top-level.html
 
 # checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years/checkpoint/906fcc7ffc6248499206a0cc720deda8/inference-anemoi-by_step-epoch_004-step_049000.ckpt
-checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years/checkpoint/a8bd313710bf4ad58c17f1c2ada8aabc/inference-anemoi-by_step-epoch_000-step_010000.ckpt
+checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years/checkpoint/a8bd313710bf4ad58c17f1c2ada8aabc/inference-anemoi-by_step-epoch_001-step_012000.ckpt
 
-date: 2013-12-01 #specifies the reference date of the forecast (the starting date)
+date: DATEHERE #specifies the reference date of the forecast (the starting date)
 
 lead_time: 240h # specifies the forecast lead time in hours
 
@@ -29,6 +29,6 @@ output:
   extract_lam:
     output:
       netcdf:
-        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years/inference/xaver_2013-12-01_240h_step073000.nc
+        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years/inference/DATEHERE_240h_step075000.nc
 
 # its also possible to output truth
