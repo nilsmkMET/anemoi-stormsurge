@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name="anemoi_surge"
+#SBATCH --job-name="infer"
 #SBATCH --output=/home/nilsmk/logs/inference_gpuHPLmpi-%x.%J.%N.out.log
 #SBATCH --gres=gpu:nvidia_h200_nvl:1
 ##SBATCH --partition=gpuB-research
 #SBATCH --partition=gpuB-prod
-#SBATCH --time=6:00:00
+#SBATCH --time=0:10:00
 #SBATCH --account=stormsurge_ml
 #SBATCH --mem=64g
 #SBATCH --mail-type=FAIL,END
@@ -15,4 +15,6 @@ source ~/venv/anemoi/bin/activate
 ulimit -v unlimited
 
 cd /home/nilsmk/GIT/anemoi-stormsurge/inference
-anemoi-inference run main-anemoi-infer-longrun.yaml
+# anemoi-inference run main-anemoi-infer-longrun.yaml
+# anemoi-inference run main-anemoi-infer-90s_uncorr.yaml
+anemoi-inference run main-anemoi-infer-90s_corrected.yaml

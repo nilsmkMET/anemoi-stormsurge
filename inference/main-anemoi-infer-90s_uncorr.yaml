@@ -1,7 +1,7 @@
 # Docs:
 # https://anemoi.readthedocs.io/projects/inference/en/latest/inference/configs/top-level.html
 
-checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph/checkpoint/c6b3477414db4ad785344e3dd221b874/inference-anemoi-by_step-epoch_000-step_021000.ckpt
+checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_uncorr/checkpoint/bcb61a65894645648d0b641d379908bb/inference-anemoi-by_step-epoch_001-step_057000.ckpt
 
 date: 2013-12-01 #specifies the reference date of the forecast (the starting date)
 
@@ -28,6 +28,6 @@ output:
   extract_lam:
     output:
       netcdf:
-        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph/inference/xaver_2013-12-01_240h_step021000.nc
+        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_uncorr/inference/xaver_2013-12-01_240h_step057000.nc
 
 # its also possible to output truth

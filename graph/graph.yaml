@@ -11,12 +11,12 @@ nodes:
       _target_: anemoi.graphs.nodes.AnemoiDatasetNodes
       dataset: 
         cutout:
-          - dataset: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2/1980/zarr/nordic4_surge_ocean_1980.zarr #regional
-          # - dataset: /lustre/storeB/users/nilsmk/Forcing/nordic4km_stress/n3e5_remake/zarr/nordic4_surge_atmos_1980_Pair.zarr #regional
+          # - dataset: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2/1980/zarr/nordic4_surge_ocean_1980.zarr #regional
+          - dataset: /lustre/storeB/users/nilsmk/anemoi-datasets/input/nordic4_surge_ocean_1980-2022.zarr #regional
             trim_edge: 5
             #thinning: 4
-          - dataset: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2/1980/zarr/nordic4_surge_ocean_1980.zarr #global
-          # - dataset: /lustre/storeB/users/nilsmk/Forcing/nordic4km_stress/n3e5_remake/zarr/nordic4_surge_atmos_1980_Pair.zarr #global
+          # - dataset: /lustre/storeB/users/nilsmk/stormrisk/nora3_v2/1980/zarr/nordic4_surge_ocean_1980.zarr #global
+          - dataset: /lustre/storeB/users/nilsmk/anemoi-datasets/input/nordic4_surge_ocean_1980-2022.zarr #global
             #thinning: 4
         adjust: all
         min_distance_km: 4 #test both thinning and min_distance 
@@ -69,7 +69,8 @@ edges:
   - _target_: anemoi.graphs.edges.MultiScaleEdges
     x_hops: 1
     # scale_resolutions: 8 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
-    scale_resolutions: 4 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
+    # scale_resolutions: 4 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
+    scale_resolutions: [4,5,6,7,8,9,10] # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
     source_mask_attr_name: null
     target_mask_attr_name: null
   attributes: 

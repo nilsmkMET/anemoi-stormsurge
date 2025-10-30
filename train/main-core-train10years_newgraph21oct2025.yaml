@@ -1,0 +1,235 @@
+defaults:
+- data: zarr
+- dataloader: native_grid
+- datamodule: single
+- diagnostics: evaluation
+- hardware: slurm
+- graph: limited_area # --> we can create the graph in another step: uncomment this and only add minimum needed under 'graph'
+- model: graphtransformer
+- training: lam 
+- override hydra/hydra_logging: disabled
+- override hydra/job_logging: disabled
+- _self_
+
+config_validation: False
+
+hydra:  
+  output_subdir: null  
+  run:  
+    dir: .
+
+data:
+  frequency: 1h
+  timestep: 1h
+  forcing:
+  - h
+  - x_wind_10m
+  - y_wind_10m
+  - air_pressure_at_sea_level
+  - cos_julian_day   
+  - cos_latitude     
+  - cos_local_time   
+  - cos_longitude    
+  - f                
+  - insolation       
+  - sin_julian_day   
+  - sin_latitude   
+  - sin_local_time
+  - sin_longitude
+  - mask_rho
+
+  diagnostic: []
+    
+  processors:
+    imputer:
+      _target_: anemoi.models.preprocessing.imputer.InputImputer
+      _convert_: all
+      config: 
+        default: "none"
+        mean:  
+        - zeta
+
+  
+    normalizer:
+      _target_: anemoi.models.preprocessing.normalizer.InputNormalizer
+
+      config:
+        default: "mean-std"
+        std: []
+        min-max:
+        max: # Data is normalised by dividing by the max value (, so the ‘zero’ point and the proportional distance from this point is retained)
+        - h
+        none:
+        - cos_julian_day   
+        - cos_latitude     
+        - cos_local_time   
+        - cos_longitude  
+        - insolation           
+        - sin_julian_day   
+        - sin_latitude   
+        - sin_local_time
+        - sin_longitude
+        - mask_rho
+      
+dataloader:
+  num_workers:
+    training: 2
+    validation: 2
+    test: 2
+  batch_size: 
+    training: 4 # has to be 1 for model-paralell
+    validation: 4
+    test: 4
+
+  limit_batches:
+    training: null
+    validation: null
+    test: 20 
+  
+  dataset:
+    cutout:
+    - dataset:
+        join:
+          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
+            frequency: ${data.frequency}
+            start: 1980
+            end: 2022
+          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
+            frequency: ${data.frequency}
+        adjust: ["start", "end"]
+      trim_edge: 5
+    - dataset:
+        join:
+          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
+            frequency: ${data.frequency}
+          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
+            frequency: ${data.frequency}
+        adjust: ["start", "end"]
+    adjust: all
+  grid_indices:
+    _target_: anemoi.training.data.grid_indices.MaskedGrid
+    nodes_name: data
+    node_attribute_name: indices_connected_nodes
+
+  training: #ca 70%
+    dataset: ${dataloader.dataset} 
+    start: 1980-01-01
+    end: 2010-01-01
+    drop: []
+
+  validation_rollout: 1 # TODO change later
+
+  validation: # ca 30%
+    dataset: ${dataloader.dataset}
+    start: 2010-01-01
+    end: 2013-01-01
+    drop: []
+  test: # ca 3-5 years
+    dataset: ${dataloader.dataset}
+    start: 2013-01-01
+    end: 2022-12-31
+    drop: []
+
+diagnostics:
+  plot: 
+    callbacks: []
+  log:
+    mlflow:
+      enabled: True
+      offline: True
+      authentication: True
+      tracking_uri: https://mlflow.ecmwf.int
+      experiment_name: 'metno-fou-stormflo'
+      run_name: 'first_test' #change this
+    wandb: 
+      entity: null
+  print_memory_summary: True
+  checkpoint:
+    every_n_minutes:
+      save_frequency: 30 # Approximate, as this is checked at the end of training steps
+      num_models_saved: -1 # If set to k, saves the 'last' k model weights in the training.
+
+    every_n_epochs:
+      save_frequency: 1
+      num_models_saved: -1 # If set to -1, all checkpoints are kept ensuring runs can be continued/forked at any point in the training process
+
+    every_n_train_steps:
+      save_frequency: 1000 # Does not scale with rollout
+      num_models_saved: -1
+
+
+hardware:
+  paths:
+    data: /lustre/storeB/users/nilsmk/anemoi-datasets/input/
+    output: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_graph10.3_1980-2012/
+    graph: /home/nilsmk/GIT/anemoi-stormsurge/output/
+  files:
+    dataset:
+      dataset_main: nordic4_surge_ocean_1980-2022.zarr
+      dataset_force: nordic4_surge_atmos_1980-2022.zarr
+    graph: graph10.3.pt
+    warm_start: null #specific checkpoint to start from, defaults to last.ckpt
+
+  num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
+  num_nodes: 1
+  num_gpus_per_model: 1 # TODO: 8 better? This is so-called "model-paralell"
+
+graph:
+  overwrite: False # only create/re-generate the graph with True
+  nodes:
+    data:
+      hidden:
+        node_builder:
+          resolution: 10
+  attributes:
+    nodes:
+      area_weight:
+        _target_: anemoi.graphs.nodes.attributes.UniformWeights # default is PlanarAreaWeights
+
+model: 
+  num_channels: 256 #1024 #TODO: this number dont have to be so large when have few vars, use higher nr when have more layers vars. Test to see if higher than 256 gives added value. Or higher when have less mesh points (remove land)
+  trainable_parameters:
+    data: 0
+    hidden: 0
+    data2hidden: 0
+    hidden2data: 0
+    hidden2hidden: 0 # GNN and GraphTransformer Processor only
+  bounding: #These are applied in order
+    - _target_: anemoi.models.layers.bounding.ReluBounding
+      variables: [] #[salinity_0]
+  output_mask: # suggested by lam.yaml
+    _target_: anemoi.training.utils.masks.Boolean1DMask
+    nodes_name: ${graph.data}
+    attribute_name: cutout_mask
+
+training:
+  # This section is to avoid using variable_loss_scaling 
+  training_loss:
+    # loss class to initialise
+    _target_: anemoi.training.losses.MSELoss
+    # Scalers to include in loss calculation
+    scalers: ['general_variable', 'nan_mask_weights', 'node_weights']
+    ignore_nans: False
+  # This supposedly fixes memory bug affecting loss
+  precision: bf16-mixed
+
+
+  metrics: # this used to list only a few variables
+  - 'all'  
+
+  #TODO rollout is here
+
+  # run_id: a8bd313710bf4ad58c17f1c2ada8aabc # checkpoint id for the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
+  # fork_run_id: 906fcc7ffc6248499206a0cc720deda8 #path to the experiment to fork from with output_base as root
+  run_id: null # checkpoint id for the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
+  fork_run_id: null #path to the experiment to fork from with output_base as root
+  transfer_learning: False # activate to perform transfer learning
+  load_weights_only: False # loads entire model if False, loads only weights if True
+  
+  max_epochs: 50
+  max_steps: 1e5
+  lr:
+    warmup: 1000 # number of warmup iterations
+    rate: 6.25e-4 #local_lr, was orig 6.25e-5
+    iterations: ${training.max_steps} # NOTE: When max_epochs < max_steps, scheduler will run for max_steps
+    min: 3e-7 #Not scaled by #GPU
