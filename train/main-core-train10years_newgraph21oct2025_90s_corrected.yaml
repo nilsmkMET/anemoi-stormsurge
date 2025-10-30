@@ -220,9 +220,9 @@ training:
   #TODO rollout is here
 
   # run_id: a8bd313710bf4ad58c17f1c2ada8aabc # checkpoint id for the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
+  fork_run_id: 13a44f3aebfc4520933725ba3af240b6 #path to the experiment to fork from with output_base as root
   run_id: null # checkpoint id for the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
-  # fork_run_id: 906fcc7ffc6248499206a0cc720deda8 #path to the experiment to fork from with output_base as root
-  fork_run_id: null #path to the experiment to fork from with output_base as root
+  # fork_run_id: null #path to the experiment to fork from with output_base as root
   transfer_learning: False # activate to perform transfer learning
   load_weights_only: False # loads entire model if False, loads only weights if True
   
