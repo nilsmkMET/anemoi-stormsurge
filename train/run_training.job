@@ -1,9 +1,8 @@
 #!/bin/bash
-#SBATCH --job-name="train"
+#SBATCH --job-name="ppitrain"
 #SBATCH --output=/home/nilsmk/logs/training_gpuHPLmpi-%x.%J.%N.out.log
 #SBATCH --gres=gpu:nvidia_h200_nvl:1
 #SBATCH --partition=gpuB-research
-##SBATCH --partition=gpuA-prod
 #SBATCH --time=96:00:00
 #SBATCH --account=stormsurge_ml
 #SBATCH --mem=64g
@@ -21,5 +20,6 @@ cd /home/nilsmk/GIT/anemoi-stormsurge/train
 # anemoi-training train --config-name=main-core
 # anemoi-training train --config-name=main-core-train10years
 # anemoi-training train --config-name=main-core-train10years_newgraph21oct2025_90s_uncorr
-anemoi-training train --config-name=main-core-train10years_newgraph21oct2025_90s_corrected
+# anemoi-training train --config-name=main-core-train10years_newgraph21oct2025_90s_corrected
 # anemoi-training train --config-name=main-core-train10years_newgraph21oct2025
+anemoi-training train --config-name=main-core-train5years_newgraph21oct2025_90s_uncorr

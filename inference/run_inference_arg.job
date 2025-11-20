@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name="quick_inference"
+#SBATCH --job-name="infer"
 #SBATCH --output=/home/nilsmk/logs/inference_gpuHPLmpi-%x.%J.%N.out.log
 #SBATCH --gres=gpu:nvidia_h200_nvl:1
 #SBATCH --partition=gpuB-research
 ##SBATCH --partition=gpuB-prod
-#SBATCH --time=0:10:00
+#SBATCH --time=2:30:00
 #SBATCH --account=stormsurge_ml
 #SBATCH --mem=64g
 #SBATCH --mail-type=FAIL
