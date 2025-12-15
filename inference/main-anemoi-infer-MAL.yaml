@@ -1,12 +1,20 @@
 # Docs:
 # https://anemoi.readthedocs.io/projects/inference/en/latest/inference/configs/top-level.html
 
-checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_graph10.3_1980-2012/checkpoint/80d41f7a364d4665813503df9bb0a963/inference-anemoi-by_step-epoch_000-step_STEPHERE.ckpt
+# checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_5years_newgraph_90s_uncorr/checkpoint/08c4a6059bc64e8cb7332a5ca028537d/inference-anemoi-by_step-epoch_EPOCHHERE-step_STEPHERE.ckpt
+# checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_corrected/checkpoint/69305e27515e4891baff50ebfb423805/inference-anemoi-by_step-epoch_EPOCHHERE-step_STEPHERE.ckpt
+# steps 0 to 46k:
+checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_uncorr/checkpoint/5c1df930cb154a5e9fa8784e65e3f23c/inference-anemoi-by_step-epoch_EPOCHHERE-step_STEPHERE.ckpt
+# # steps 47k to 57k:
+# checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_uncorr/checkpoint/bcb61a65894645648d0b641d379908bb/inference-anemoi-by_step-epoch_EPOCHHERE-step_STEPHERE.ckpt
+# # steps 58k to 100k:
+# checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_uncorr/checkpoint/36e368ee51fc4593a68355c72d1ca1c2/inference-anemoi-by_step-epoch_EPOCHHERE-step_STEPHERE.ckpt
 
 date: DATEHERE #specifies the reference date of the forecast (the starting date)
 
-lead_time: 240h # specifies the forecast lead time in hours
-# lead_time: 8736h # specifies the forecast lead time in hours
+# lead_time: 240h # specifies the forecast lead time in hours
+# lead_time: 8760h # specifies the forecast lead time in hours
+lead_time: RUNHRS # specifies the forecast lead time in hours
 
 #device: cuda
 # runner: parallel # run across multiple gpus
@@ -29,6 +37,6 @@ output:
   extract_lam:
     output:
       netcdf:
-        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_graph10.3_1980-2012/inference/DATEHERE_EXPNAME_stepSTEPHERE.nc
+        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_uncorr/inference/DATEHERE_EXPNAME_stepSTEPHERE.nc
 
 # its also possible to output truth

@@ -1,18 +1,19 @@
 # Docs:
 # https://anemoi.readthedocs.io/projects/inference/en/latest/inference/configs/top-level.html
 
-checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_graph10.3_1980-2012/checkpoint/80d41f7a364d4665813503df9bb0a963/inference-anemoi-by_step-epoch_000-step_149000.ckpt
+# checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_graph10.3_1980-2012/checkpoint/80d41f7a364d4665813503df9bb0a963/inference-anemoi-by_step-epoch_000-step_149000.ckpt
+checkpoint: /lustre/storeB/project/fou/hi/foccus/experiments/SF_initial/checkpoint/b5631dcd2a6f4ece9fe45ddd5a6e9655/inference-anemoi-by_time-epoch_002-step_200000.ckpt
 
-date: 2013-01-02 #specifies the reference date of the forecast (the starting date)
+date: 2013-01-01 #specifies the reference date of the forecast (the starting date)
 
-# lead_time: 240h # specifies the forecast lead time in hours
-lead_time: 8736h # specifies the forecast lead time in hours
+lead_time: 24h # specifies the forecast lead time in hours
+# lead_time: 8736h # specifies the forecast lead time in hours
 
 # device: cpu
 # runner: parallel # run across multiple gpus
 # runner: cutout
 
-input: test # use the dataset that was used during training as input. test (default), training or validation
+# input: test # use the dataset that was used during training as input. test (default), training or validation
 
 # You can also provide a full dataset specification as follows:
 # (e.g. as done in training)
@@ -21,14 +22,14 @@ input: test # use the dataset that was used during training as input. test (defa
 #    cutout:
 #      - dataset: ...
 
-# input:
-#   dataset:
-#     join:
-#       - dataset: /lustre/storeB/users/nilsmk/anemoi-datasets/input/nordic4_surge_ocean_1980-2022.zarr
-#         frequency: 1h
-#       - dataset: /lustre/storeB/users/nilsmk/anemoi-datasets/input/nordic4_surge_atmos_1980-2022.zarr
-#         frequency: 1h
-#     adjust: ["start", "end"]
+input:
+  dataset:
+    join:
+      - dataset: /lustre/storeB/users/nilsmk/anemoi-datasets/input/nordic4_surge_ocean_1980-2022.zarr
+        frequency: 1h
+      - dataset: /lustre/storeB/users/nilsmk/anemoi-datasets/input/nordic4_surge_atmos_1980-2022.zarr
+        frequency: 1h
+    adjust: ["start", "end"]
 
 #output:
 #  netcdf: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2024-cloud/inference/full-reset.nc
@@ -38,6 +39,6 @@ output:
   extract_lam:
     output:
       netcdf:
-        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_graph10.3_1980-2012/inference/lam-8760h_test_step149000.nc
+        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/mateusz_olivia/inference/lam-24h_test_step200000.nc
 
 # its also possible to output truth

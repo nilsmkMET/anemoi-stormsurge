@@ -3,7 +3,7 @@
 
 checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_corrected/checkpoint/69305e27515e4891baff50ebfb423805/inference-anemoi-by_step-epoch_002-step_100000.ckpt
 
-date: 2013-12-01 #specifies the reference date of the forecast (the starting date)
+date: 2010-02-05 #specifies the reference date of the forecast (the starting date)
 
 lead_time: 240h # specifies the forecast lead time in hours
 
@@ -28,6 +28,6 @@ output:
   extract_lam:
     output:
       netcdf:
-        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_corrected/inference/xaver_2013-12-01_240h_step100000.nc
+        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_corrected/inference/elsa_2010-02-05_240h_step100000.nc
 
 # its also possible to output truth

@@ -1,13 +1,13 @@
 # Docs:
 # https://anemoi.readthedocs.io/projects/inference/en/latest/inference/configs/top-level.html
 
-checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_uncorr/checkpoint/36e368ee51fc4593a68355c72d1ca1c2/inference-anemoi-by_step-epoch_002-step_100000.ckpt
+checkpoint: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_5years_newgraph_90s_uncorr/checkpoint/08c4a6059bc64e8cb7332a5ca028537d/inference-anemoi-by_step-epoch_010-step_100000.ckpt
 
 date: 2010-01-02 #specifies the reference date of the forecast (the starting date)
 
 lead_time: 78840h # specifies the forecast lead time in hours
 
-#device: cuda
+# device: cuda
 # runner: parallel # run across multiple gpus
 # runner: cutout
 
@@ -28,6 +28,6 @@ output:
   extract_lam:
     output:
       netcdf:
-        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_10years_newgraph_90s_uncorr/inference/long_2010-01-02_78840h_step100000.nc
+        path: /lustre/storeB/users/nilsmk/anemoi-datasets/output/longrun_5years_newgraph_90s_uncorr/inference/long_2010-01-02_78840h_step100000.nc
 
 # its also possible to output truth
