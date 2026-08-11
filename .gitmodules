@@ -1,0 +1,3 @@
+[submodule "checkpoints"]
+	path = checkpoints
+	url = git@github.com:nilsmkMET/flo-checkpoints.git
